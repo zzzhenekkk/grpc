@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package transmitter;
+
+option go_package = "./transmitter"; // Указывает на текущую директорию
+
+service Transmitter {
+  rpc TransmitFrequencies (FrequencyRequest) returns (stream FrequencyResponse);
+}
+
+message FrequencyRequest {
+  string client_id = 1;
+}
+
+message FrequencyResponse {
+  string session_id = 1;
+  double frequency = 2;
+  int64 timestamp = 3;
+}

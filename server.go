@@ -6,29 +6,28 @@ import (
 	"net"
 	"time"
 
+	pb "src/transmitter"
+
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
-	pb "path/to/your/generated/protobuf/package"
 )
 
 type server struct {
 	pb.UnimplementedTransmitterServer
 }
 
+// TransmitFrequencies реализует серверный поток gRPC
 func (s *server) TransmitFrequencies(req *pb.FrequencyRequest, stream pb.Transmitter_TransmitFrequenciesServer) error {
-	// Генерация нового session_id и случайных значений для mean и stdDev
 	sessionID := uuid.New().String()
-	mean := -10 + rand.Float64()*(10-(-10))
-	stdDev := 0.3 + rand.Float64()*(1.5-0.3)
+	mean := -10 + rand.Float64()*(20)    // Случайное значение mean от -10 до 10
+	stdDev := 0.3 + rand.Float64()*(1.2) // Случайное значение stdDev от 0.3 до 1.5
 
 	log.Printf("New session: %s, mean: %f, stdDev: %f", sessionID, mean, stdDev)
 
 	for {
-		// Генерация случайной частоты на основе нормального распределения
 		frequency := rand.NormFloat64()*stdDev + mean
 		timestamp := time.Now().UTC().Unix()
 
-		// Отправка ответа клиенту
 		resp := &pb.FrequencyResponse{
 			SessionId: sessionID,
 			Frequency: frequency,
@@ -38,7 +37,6 @@ func (s *server) TransmitFrequencies(req *pb.FrequencyRequest, stream pb.Transmi
 			return err
 		}
 
-		// Задержка перед отправкой следующего сообщения
 		time.Sleep(time.Second)
 	}
 }
